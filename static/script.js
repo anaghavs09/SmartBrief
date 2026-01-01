@@ -1,9 +1,17 @@
+// -------------------------------
+// FirstLight Newsletter JS
+// -------------------------------
+
+// Set your deployed backend URL here
+const BACKEND_URL = 'https://firstlight.fly.dev'; // <-- Replace with your actual backend URL
+
 const form = document.getElementById('subscribeForm');
 const emailInput = document.getElementById('emailInput');
 const subscribeBtn = document.getElementById('subscribeBtn');
 const messageDiv = document.getElementById('message');
 const locationInfo = document.getElementById('locationInfo');
 
+// Handle subscription form submit
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -14,7 +22,6 @@ form.addEventListener('submit', async (e) => {
         return;
     }
     
-    // Request location permission
     subscribeBtn.disabled = true;
     subscribeBtn.textContent = 'Getting Location...';
     
@@ -26,23 +33,19 @@ form.addEventListener('submit', async (e) => {
     }
     
     navigator.geolocation.getCurrentPosition(
-        // Success callback
         async (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Get location name
             const locationName = await getLocationName(latitude, longitude);
             
-            // Show location info
             locationInfo.textContent = `📍 Location detected: ${locationName}`;
             locationInfo.classList.add('show');
             
-            // Send to backend
             subscribeBtn.textContent = 'Subscribing...';
             
             try {
-                const response = await fetch('/api/subscribe', {
+                const response = await fetch(`${BACKEND_URL}/api/subscribe`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -72,7 +75,6 @@ form.addEventListener('submit', async (e) => {
             subscribeBtn.disabled = false;
             subscribeBtn.textContent = 'Subscribe';
         },
-        // Error callback
         (error) => {
             let errorMessage = 'Unable to get your location. ';
             
@@ -97,6 +99,7 @@ form.addEventListener('submit', async (e) => {
     );
 });
 
+// Reverse geocode to get city and country
 async function getLocationName(lat, lon) {
     try {
         const response = await fetch(
@@ -114,6 +117,7 @@ async function getLocationName(lat, lon) {
     }
 }
 
+// Display feedback messages
 function showMessage(text, type) {
     messageDiv.textContent = text;
     messageDiv.className = `message ${type}`;
@@ -124,13 +128,13 @@ function showMessage(text, type) {
     }, 5000);
 }
 
-// Unsubscribe link
+// Handle unsubscribe
 document.getElementById('unsubscribeLink').addEventListener('click', (e) => {
     e.preventDefault();
     const email = prompt('Enter your email to unsubscribe:');
     
     if (email) {
-        fetch('/api/unsubscribe', {
+        fetch(`${BACKEND_URL}/api/unsubscribe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -143,6 +147,7 @@ document.getElementById('unsubscribeLink').addEventListener('click', (e) => {
         })
         .catch(error => {
             alert('Failed to unsubscribe. Please try again.');
+            console.error(error);
         });
     }
 });

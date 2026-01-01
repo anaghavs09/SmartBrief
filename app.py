@@ -256,10 +256,10 @@ if __name__ == '__main__':
     print("="*70)
     print("📍 ROUTES:")
     print("="*70)
-    print("🏠 Home Page:  http://localhost:5000")
-    print("👤 Admin Page: http://localhost:5000/admin")
-    print("🧪 Test Page:  http://localhost:5000/test")
-    print("📊 API List:   http://localhost:5000/api/subscribers")
+    print("🏠 Home Page:  http://localhost:8080")
+    print("👤 Admin Page: http://localhost:8080/admin")
+    print("🧪 Test Page:  http://localhost:8080/test")
+    print("📊 API List:   http://localhost:8080/api/subscribers")
     print("="*70)
     print()
     
@@ -268,4 +268,4 @@ if __name__ == '__main__':
         print("   The server will start but pages may not load correctly.")
         print()
     
-    app.run(debug=True, port=8080, host='127.0.0.1')
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
