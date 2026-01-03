@@ -1,19 +1,34 @@
 import sqlite3
-from datetime import datetime
 import time
+
+DB_PATH = "subscribers.db"
+
+
+# --------------------------------------------------
+# CONNECTION
+# --------------------------------------------------
 
 def get_connection():
     """Get database connection with timeout"""
-    conn = sqlite3.connect('subscribers.db', timeout=10.0, check_same_thread=False)
-    conn.execute('PRAGMA journal_mode=WAL')  # Write-Ahead Logging mode
+    conn = sqlite3.connect(
+        DB_PATH,
+        timeout=10.0,
+        check_same_thread=False
+    )
+    conn.execute("PRAGMA journal_mode=WAL")
     return conn
 
+
+# --------------------------------------------------
+# INIT
+# --------------------------------------------------
+
 def init_db():
-    """Initialize the database with subscribers table"""
+    """Initialize the database"""
     conn = get_connection()
     cursor = conn.cursor()
-    
-    cursor.execute('''
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS subscribers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
@@ -21,96 +36,135 @@ def init_db():
             longitude REAL NOT NULL,
             location_name TEXT,
             subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_active BOOLEAN DEFAULT 1
-        )
-    ''')
-    
+            is_active BOOLEAN DEFAULT 1,
+            last_sent_date DATE
+        );
+    """)
+
     conn.commit()
     conn.close()
     print("✅ Database initialized!")
 
+
+# --------------------------------------------------
+# ADD SUBSCRIBER
+# --------------------------------------------------
+
 def add_subscriber(email, latitude, longitude, location_name=None):
-    """Add a new subscriber to the database"""
     max_retries = 3
-    retry_count = 0
-    
-    while retry_count < max_retries:
+
+    for _ in range(max_retries):
         try:
             conn = get_connection()
             cursor = conn.cursor()
-            
-            cursor.execute('''
+
+            cursor.execute("""
                 INSERT INTO subscribers (email, latitude, longitude, location_name)
                 VALUES (?, ?, ?, ?)
-            ''', (email, latitude, longitude, location_name))
-            
+            """, (email, latitude, longitude, location_name))
+
             conn.commit()
             conn.close()
             return True, "Subscribed successfully!"
-            
+
         except sqlite3.IntegrityError:
-            if conn:
-                conn.close()
+            conn.close()
             return False, "Email already subscribed!"
-            
+
         except sqlite3.OperationalError as e:
+            conn.close()
             if "locked" in str(e).lower():
-                retry_count += 1
-                if conn:
-                    conn.close()
-                time.sleep(0.1)  # Wait 100ms before retry
-                if retry_count >= max_retries:
-                    return False, "Database busy, please try again"
+                time.sleep(0.1)
             else:
-                if conn:
-                    conn.close()
-                return False, f"Error: {str(e)}"
-                
+                return False, str(e)
+
         except Exception as e:
-            if conn:
-                conn.close()
-            return False, f"Error: {str(e)}"
-    
-    return False, "Failed after retries"
+            conn.close()
+            return False, str(e)
+
+    return False, "Database busy, try again"
+
+
+# --------------------------------------------------
+# READ SUBSCRIBERS (USED BY DIGEST)
+# --------------------------------------------------
 
 def get_all_subscribers():
-    """Get all active subscribers"""
+    """Return active subscribers with last_sent_date"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT id, email, latitude, longitude, location_name, subscribed_at
-            FROM subscribers 
+
+        cursor.execute("""
+            SELECT
+                id,
+                email,
+                latitude,
+                longitude,
+                location_name,
+                last_sent_date
+            FROM subscribers
             WHERE is_active = 1
-        ''')
-        
-        subscribers = cursor.fetchall()
+        """)
+
+        rows = cursor.fetchall()
         conn.close()
-        
-        return subscribers
+        return rows
+
     except Exception as e:
-        print(f"Error getting subscribers: {e}")
+        print(f"❌ Error fetching subscribers: {e}")
         return []
 
-def unsubscribe(email):
-    """Unsubscribe a user"""
+
+# --------------------------------------------------
+# UPDATE LAST SENT DATE
+# --------------------------------------------------
+
+def update_last_sent_date(subscriber_id, sent_date):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        
-        cursor.execute('''
-            UPDATE subscribers 
-            SET is_active = 0 
+
+        cursor.execute("""
+            UPDATE subscribers
+            SET last_sent_date = ?
+            WHERE id = ?
+        """, (sent_date, subscriber_id))
+
+        conn.commit()
+        conn.close()
+
+    except Exception as e:
+        print(f"❌ Failed updating last_sent_date: {e}")
+
+
+# --------------------------------------------------
+# UNSUBSCRIBE
+# --------------------------------------------------
+
+def unsubscribe(email):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE subscribers
+            SET is_active = 0
             WHERE email = ?
-        ''', (email,))
-        
+        """, (email,))
+
         conn.commit()
         conn.close()
         return True
+
     except Exception as e:
-        print(f"Error unsubscribing: {e}")
+        print(f"❌ Unsubscribe failed: {e}")
         return False
+
+
+# --------------------------------------------------
+# RUN DIRECTLY
+# --------------------------------------------------
 
 if __name__ == "__main__":
     init_db()
