@@ -4,62 +4,75 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
-import pytz
-from timezonefinder import TimezoneFinder
+
 from dotenv import load_dotenv
+from timezonefinder import TimezoneFinder
+import pytz
 
-from database import get_all_subscribers
+from database import get_all_subscribers, update_last_sent_date
 
-# Load environment variables
+# ----------------------------
+# Load env
+# ----------------------------
 load_dotenv()
 
-# ----------------------------
-# Gemini / Google Generative AI
-# ----------------------------
-import google.generativeai as genai
-
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-client = genai.Client(api_key=GEMINI_API_KEY)
-
-# ----------------------------
-# Email config
-# ----------------------------
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
 SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD")
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+if not all([SENDER_EMAIL, SENDER_PASSWORD, NEWS_API_KEY, GEMINI_API_KEY]):
+    raise RuntimeError("📌 Missing required environment variables!")
+
+# ----------------------------
+# Gemini / Google GenAI
+# ----------------------------
+from google.genai import Client
+
+client = Client(api_key=GEMINI_API_KEY)
+MODEL_NAME = "models/gemini-2.5-flash"
 
 # ----------------------------
 # Timezone finder
 # ----------------------------
 tf = TimezoneFinder()
 
-# ----------------------------
-# Check if we should send email now (5–7 PM CST)
-# ----------------------------
-def should_send_now(lat, lon):
+def should_send_now(lat, lon, last_sent_date):
+    """
+    Only send if local time is between 17:00–18:59
+    and email has NOT been sent today.
+    """
     tz_name = tf.timezone_at(lat=lat, lng=lon)
     if not tz_name:
         return False
+
     local_tz = pytz.timezone(tz_name)
     local_time = datetime.now(pytz.utc).astimezone(local_tz)
-    # Send between 5 PM and 6:59 PM local
+
+    # Only once per day
+    today_local = local_time.date().isoformat()
+    if last_sent_date == today_local:
+        return False
+
+    # Only between 5–7 PM
     return 17 <= local_time.hour < 19
 
 # ----------------------------
-# Weather fetch
+# Weather
 # ----------------------------
 def fetch_weather(lat, lon):
     url = (
-        f"https://api.open-meteo.com/v1/forecast"
+        "https://api.open-meteo.com/v1/forecast"
         f"?latitude={lat}&longitude={lon}"
         "&current_weather=true"
         "&daily=temperature_2m_max,temperature_2m_min,"
         "apparent_temperature_max,apparent_temperature_min,"
-        "sunrise,sunset,precipitation_sum,uv_index_max,cloudcover_mean"
+        "sunrise,sunset,precipitation_sum,cloudcover_mean"
         "&timezone=auto"
     )
-    data = requests.get(url).json()
-    current = data.get("current_weather", {})
-    daily = data.get("daily", {})
+    r = requests.get(url, timeout=10).json()
+    current = r.get("current_weather", {})
+    daily = r.get("daily", {})
 
     feels_like = (
         daily.get("apparent_temperature_max", [current.get("temperature")])[0] +
@@ -67,72 +80,57 @@ def fetch_weather(lat, lon):
     ) / 2
 
     return {
-        "temp": current.get("temperature"),
-        "windspeed": current.get("windspeed"),
-        "winddir": current.get("winddirection"),
-        "max": daily["temperature_2m_max"][0],
         "min": daily["temperature_2m_min"][0],
+        "max": daily["temperature_2m_max"][0],
         "feels_like": round(feels_like, 1),
         "sunrise": daily["sunrise"][0].split("T")[1],
         "sunset": daily["sunset"][0].split("T")[1],
         "cloudcover": daily.get("cloudcover_mean", [0])[0],
-        "precipitation": daily.get("precipitation_sum", [0])[0],
-        "uv_index": daily.get("uv_index_max", [0])[0]
+        "precipitation": daily.get("precipitation_sum", [0])[0]
     }
 
 # ----------------------------
-# News fetch
+# News
 # ----------------------------
 def fetch_news(country="us", max_articles=5):
-    NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
     url = (
-        f"https://newsapi.org/v2/top-headlines"
+        "https://newsapi.org/v2/top-headlines"
         f"?country={country}&pageSize={max_articles}"
         f"&apiKey={NEWS_API_KEY}"
     )
-    data = requests.get(url).json()
-    articles = data.get("articles", [])
-    news_list = []
-    for article in articles:
-        title = article.get("title")
-        desc = article.get("description")
-        if title and desc:
-            news_list.append(f"{title} - {desc}")
-    return news_list
+    r = requests.get(url, timeout=10).json()
+    return [
+        f"{a['title']} – {a['description']}"
+        for a in r.get("articles", [])
+        if a.get("title") and a.get("description")
+    ]
 
 # ----------------------------
-# AI email content
+# Build email content using AI
 # ----------------------------
 def ai_morning_message(weather, location, news_list):
     today = datetime.now().strftime("%A, %d %B %Y")
     news_text = "\n".join(news_list) if news_list else "No major news today."
+
     prompt = f"""
-You are a calm, premium AI morning assistant.
+You are an AI that writes clean, friendly HTML email content.
 
-Generate a clean, readable HTML email.
+Generate HTML for an evening briefing.
 
-STRUCTURE EXACTLY AS BELOW:
-
-1) A warm Good Morning greeting
-2) A bold "Weather Snapshot" section with bullet points:
-   - Min
-   - Max
-   - Feels Like
-   - Sunrise
-   - Sunset
-3) A 2–3 line short weather summary
-4) A bold "Top News" section with bullet points (1–2 sentences each)
+1) Warm hello
+2) Weather snapshot (Min, Max, Feels Like, Sunrise, Sunset) as bullet list
+3) Short 2–3 sentence weather summary
+4) Top news in bullet points (1–2 sentences each)
 
 Location: {location}
 Date: {today}
 
-Weather details:
+Weather:
 Min: {weather['min']}°C
 Max: {weather['max']}°C
 Feels Like: {weather['feels_like']}°C
 Sunrise: {weather['sunrise']}
 Sunset: {weather['sunset']}
-Wind: {weather['windspeed']} km/h
 Cloud cover: {weather['cloudcover']}%
 Precipitation: {weather['precipitation']} mm
 
@@ -140,17 +138,16 @@ News:
 {news_text}
 """
 
-    response = client.generate_text(
-        model="text-bison-001",  # latest text model
-        prompt=prompt,
-        temperature=0.5
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt
     )
-    return response.result
+    return response.text
 
 # ----------------------------
 # Send email
 # ----------------------------
-def send_email(to_email, subject, html_content):
+def send_email(to_email, subject, html_body):
     msg = MIMEMultipart("alternative")
     msg["From"] = SENDER_EMAIL
     msg["To"] = to_email
@@ -158,17 +155,13 @@ def send_email(to_email, subject, html_content):
 
     full_html = f"""
     <html>
-    <body style="font-family: Arial, sans-serif; background:#f5f5f5; padding:20px;">
-      <div style="max-width:600px;margin:auto;background:white;border-radius:12px;overflow:hidden;">
-        <div style="background:#6b73ff;color:white;padding:20px;text-align:center;">
-          <h1 style="margin:0;">☀️ FirstLight</h1>
-          <p style="margin:5px 0 0;">Your AI Morning Briefing</p>
+    <body style="font-family:Arial;background:#f5f5f5;padding:20px">
+      <div style="max-width:600px;margin:auto;background:white;border-radius:10px;overflow:hidden;">
+        <div style="background:#4a90e2;color:white;text-align:center;padding:20px;">
+          <h2>🌇 SmartBrief Evening</h2>
         </div>
         <div style="padding:25px;color:#333;line-height:1.6;">
-          {html_content}
-        </div>
-        <div style="background:#fafafa;padding:15px;text-align:center;font-size:12px;color:#888;">
-          Powered by Gemini AI
+          {html_body}
         </div>
       </div>
     </body>
@@ -181,27 +174,45 @@ def send_email(to_email, subject, html_content):
         server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
 
 # ----------------------------
-# MAIN
+# MAIN PROGRAM
 # ----------------------------
 def main():
-    print("\n🚀 FirstLight Distribution Started\n")
+    print("\n🚀 SmartBrief Digest Starting\n")
     subscribers = get_all_subscribers()
-    print(f"📊 Subscribers found: {len(subscribers)}\n")
+    print(f"📊 {len(subscribers)} subscribers found\n")
 
     for sub in subscribers:
-        id_, email, lat, lon, location_name, subscribed_at = sub
-        if not should_send_now(lat, lon):
-            print(f"⏭️  Skipping {email} (not 5–7 PM local)")
+        (
+            sub_id,
+            email,
+            lat,
+            lon,
+            location_name,
+            last_sent_date
+        ) = sub
+
+        # Check if it's within allowed time and not already sent today
+        if not should_send_now(lat, lon, last_sent_date):
+            print(f"⏭ Skipping {email}")
             continue
+
         print(f"📧 Sending to {email} ({location_name})")
+
         weather = fetch_weather(lat, lon)
         news = fetch_news("us")
-        message = ai_morning_message(weather, location_name, news)
-        subject = f"☀️ FirstLight — {datetime.now().strftime('%A, %B %d')}"
-        send_email(email, subject, message)
+
+        html = ai_morning_message(weather, location_name, news)
+        subject = f"🌆 SmartBrief — {datetime.now().strftime('%A, %b %d')}"
+
+        send_email(email, subject, html)
+
+        # Update last sent date in DB
+        today_iso = datetime.now(pytz.utc).astimezone(pytz.timezone(tf.timezone_at(lat=lat, lng=lon))).date().isoformat()
+        update_last_sent_date(sub_id, today_iso)
+
         print("   ✅ Sent\n")
 
-    print("✅ FirstLight run complete\n")
+    print("🎉 All done!\n")
 
 if __name__ == "__main__":
     main()
