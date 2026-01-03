@@ -10,7 +10,7 @@ jobs:
   send_newsletter:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Checkout repo
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -26,14 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4️⃣ Load environment secrets
-      - name: Set environment variables
+      # 4️⃣ Run SmartBrief Newsletter with environment secrets
+      - name: Run SmartBrief Newsletter
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
-
-      # 5️⃣ Run script
-      - name: Run SmartBrief Newsletter
         run: python main.py
