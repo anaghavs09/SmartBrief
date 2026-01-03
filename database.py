@@ -29,17 +29,20 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS subscribers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
-            location_name TEXT,
-            subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_active BOOLEAN DEFAULT 1,
-            last_sent_date DATE
-        );
+    CREATE TABLE IF NOT EXISTS subscribers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        location_name TEXT,
+        subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_active BOOLEAN DEFAULT 1,
+        last_sent_date TEXT
+    );
+
+            )
     """)
+
 
     conn.commit()
     conn.close()
