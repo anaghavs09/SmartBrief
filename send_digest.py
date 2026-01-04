@@ -51,7 +51,7 @@ def is_7am_local_time(lat, lon, last_sent_date):
             return False  # Already sent today
         
         # Check if current hour is 7 AM (7:00-7:59)
-        is_time = local_time.hour == 7
+        is_time = local_time.hour == 10
         
         if is_time:
             print(f"      ✓ It's {local_time.strftime('%I:%M %p')} local time - TIME TO SEND!")
