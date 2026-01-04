@@ -256,7 +256,7 @@ def main():
         print(f"{'='*60}")
 
         # Check time (disabled for testing)
-        if False:  # not is_7am_local_time(lat, lon, last_sent):
+        if not is_7am_local_time(lat, lon, last_sent):
             print(f"   ⏭️  Skipping - not 7 AM local or already sent today\n")
             skipped_count += 1
             continue

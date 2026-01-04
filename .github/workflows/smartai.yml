@@ -3,7 +3,7 @@ name: SmartBrief Time-Based Distribution
 on:
   schedule:
     # Runs every 15 minutes to check all subscribers
-    - cron: "*/15 * * * *"
+    - cron: "0 * * * *"
   
   # Manual trigger for testing
   workflow_dispatch:
