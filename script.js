@@ -1,9 +1,5 @@
-// -------------------------------
-// FirstLight Newsletter JS
-// -------------------------------
-
-// Set your deployed backend URL here
-const BACKEND_URL = ''; // Empty string = use current domain
+// SmartBrief - Connected to Google Sheets
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzVOQldUHHDhvtA0wk_6ZPF85I-e6OxfwObHPbjVhyNQzTIaulYT0BLwmcMEpErh-ueGQ/exec';
 
 const form = document.getElementById('subscribeForm');
 const emailInput = document.getElementById('emailInput');
@@ -11,7 +7,6 @@ const subscribeBtn = document.getElementById('subscribeBtn');
 const messageDiv = document.getElementById('message');
 const locationInfo = document.getElementById('locationInfo');
 
-// Handle subscription form submit
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -45,8 +40,10 @@ form.addEventListener('submit', async (e) => {
             subscribeBtn.textContent = 'Subscribing...';
             
             try {
-                const response = await fetch(`${BACKEND_URL}/api/subscribe`, {
+                // Send to Google Apps Script
+                await fetch(BACKEND_URL, {
                     method: 'POST',
+                    mode: 'no-cors',  // Required for Apps Script
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -58,14 +55,9 @@ form.addEventListener('submit', async (e) => {
                     })
                 });
                 
-                const data = await response.json();
-                
-                if (data.success) {
-                    showMessage('🎉 ' + data.message + ' Check your email every morning!', 'success');
-                    emailInput.value = '';
-                } else {
-                    showMessage('❌ ' + data.message, 'error');
-                }
+                // no-cors means we can't read response, assume success
+                showMessage('🎉 Subscribed! You\'ll receive your briefing at 7 AM your local time!', 'success');
+                emailInput.value = '';
                 
             } catch (error) {
                 showMessage('❌ Failed to subscribe. Please try again.', 'error');
@@ -99,7 +91,6 @@ form.addEventListener('submit', async (e) => {
     );
 });
 
-// Reverse geocode to get city and country
 async function getLocationName(lat, lon) {
     try {
         const response = await fetch(
@@ -117,7 +108,6 @@ async function getLocationName(lat, lon) {
     }
 }
 
-// Display feedback messages
 function showMessage(text, type) {
     messageDiv.textContent = text;
     messageDiv.className = `message ${type}`;
@@ -127,27 +117,3 @@ function showMessage(text, type) {
         messageDiv.style.display = 'none';
     }, 5000);
 }
-
-// Handle unsubscribe
-document.getElementById('unsubscribeLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    const email = prompt('Enter your email to unsubscribe:');
-    
-    if (email) {
-        fetch(`${BACKEND_URL}/api/unsubscribe`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email })
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-        })
-        .catch(error => {
-            alert('Failed to unsubscribe. Please try again.');
-            console.error(error);
-        });
-    }
-});

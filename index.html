@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FirstLight - AI Morning Digest</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>SmartBrief - AI Morning Digest</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <h1>☀️ FirstLight</h1>
-            <p class="tagline">Wake up to AI-powered morning briefings</p>
+            <h1>☀️ SmartBrief</h1>
+            <p class="tagline">Wake up to AI-powered morning briefings at 7 AM your local time</p>
         </header>
 
-        <!-- Hero Section -->
         <section class="hero">
-            <h2>Start Your Day Informed</h2>
-            <p>Get personalized weather forecasts and top news delivered to your inbox every morning.</p>
+            <h2>Start Your Day Informed, Wherever You Are</h2>
+            <p>Get personalized weather forecasts and top news delivered at exactly 7 AM in your timezone.</p>
         </section>
 
-        <!-- Subscription Form -->
         <section class="subscription">
             <div class="form-container">
                 <h3>Subscribe Now</h3>
@@ -45,39 +42,37 @@
             </div>
         </section>
 
-        <!-- Features -->
         <section class="features">
             <h3>What You'll Get</h3>
             <div class="feature-grid">
                 <div class="feature">
+                    <div class="icon">🌍</div>
+                    <h4>Global Coverage</h4>
+                    <p>Works anywhere in the world</p>
+                </div>
+                <div class="feature">
                     <div class="icon">🌤️</div>
                     <h4>Local Weather</h4>
-                    <p>Detailed forecast based on your location</p>
+                    <p>Forecast for your exact location</p>
                 </div>
                 <div class="feature">
                     <div class="icon">📰</div>
                     <h4>Top News</h4>
-                    <p>Curated headlines from trusted sources</p>
+                    <p>Curated headlines that matter</p>
                 </div>
                 <div class="feature">
-                    <div class="icon">🤖</div>
-                    <h4>AI Summary</h4>
-                    <p>Powered by Google Gemini AI</p>
-                </div>
-                <div class="feature">
-                    <div class="icon">📧</div>
-                    <h4>Daily Delivery</h4>
-                    <p>Fresh briefing every morning</p>
+                    <div class="icon">⏰</div>
+                    <h4>7 AM Delivery</h4>
+                    <p>Arrives at your local 7 AM</p>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
         <footer>
-            <p>Powered by Google Gemini AI | <a href="#" id="unsubscribeLink">Unsubscribe</a> | <a href="/admin">Admin</a></p>
+            <p>Powered by Google Gemini AI | Worldwide time-zone aware delivery</p>
         </footer>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="script.js"></script>
 </body>
 </html>
