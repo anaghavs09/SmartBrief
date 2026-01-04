@@ -3,7 +3,7 @@
 // -------------------------------
 
 // Set your deployed backend URL here
-const BACKEND_URL = 'https://firstlight.fly.dev'; // <-- Replace with your actual backend URL
+const BACKEND_URL = ''; // Empty string = use current domain
 
 const form = document.getElementById('subscribeForm');
 const emailInput = document.getElementById('emailInput');
