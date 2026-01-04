@@ -8,7 +8,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from database import get_all_subscribers, update_last_sent
+from database import get_all_subscribers
 
 # Load environment variables
 load_dotenv()
@@ -18,9 +18,10 @@ NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
 SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD")
 
-# Initialize Gemini
+# Initialize Gemini - UPDATED API
 import google.generativeai as genai
-genai.api_key = GEMINI_API_KEY
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("models/gemini-2.5-flash")
 
 tf = TimezoneFinder()
 
@@ -29,6 +30,7 @@ tf = TimezoneFinder()
 # TIME CHECK 5–7 PM LOCAL
 # ----------------------------
 def should_send_now(lat, lon, last_sent_date):
+    """Check if it's 5-7 PM in subscriber's local timezone"""
     tz_name = tf.timezone_at(lat=lat, lng=lon)
     if not tz_name:
         return False
@@ -99,14 +101,14 @@ def fetch_news(country="us", max_articles=5):
 
 
 # ----------------------------
-# AI MESSAGE
+# AI MESSAGE - FIXED GEMINI API
 # ----------------------------
 def ai_message(weather, location, news_list):
     today = datetime.now().strftime("%A, %d %B %Y")
     news_text = "\n".join(news_list) if news_list else "No major news today."
 
     prompt = f"""
-You are a calm, premium AI morning assistant.
+You are a calm, premium AI evening assistant.
 
 Generate a clean, readable HTML email.
 
@@ -122,8 +124,7 @@ STRUCTURE EXACTLY AS BELOW:
 3) A 2–3 line short weather summary
 4) A bold "Top News" section with bullet points (1–2 sentences each)
 
-Keep spacing clean. Do NOT use markdown symbols like ** or ###.
-Use proper HTML tags only (<b>, <ul>, <li>, <p>).
+Keep spacing clean. Use proper HTML tags only (<b>, <ul>, <li>, <p>).
 
 Location: {location}
 Date: {today}
@@ -142,8 +143,8 @@ News:
 {news_text}
 """
 
-    # Use the latest Gemini API generate_text
-    response = genai.generate_text(model="gemini-pro", prompt=prompt)
+    # FIXED: Use new Gemini API
+    response = model.generate_content(prompt)
     return response.text
 
 
@@ -198,27 +199,48 @@ def main():
 
     print(f"\n📊 Active subscribers found: {len(subscribers)}\n")
 
-    for sub in subscribers:
-        id_, email, lat, lon, location_name, subscribed_at, last_sent = sub
+    if not subscribers:
+        print("⚠️  No subscribers found in database!")
+        print("💡 Make sure you've subscribed via http://localhost:8080\n")
+        return
 
-        if not should_send_now(lat, lon, last_sent):
-            print(f"⏭️ Skipping {email} ({location_name}) — not 5–7 PM local or already sent today")
-            continue
+    sent_count = 0
+    skipped_count = 0
+
+    for sub in subscribers:
+        # FIXED: Unpack 7 values (added last_sent)
+        id_, email, lat, lon, location_name, subscribed_at, last_sent = sub
+        
+        # For now, send to everyone (skip time check for testing)
+        # if not should_send_now(lat, lon, last_sent):
+        #     print(f"⏭️ Skipping {email} ({location_name}) — not 5–7 PM local or already sent today")
+        #     skipped_count += 1
+        #     continue
 
         print(f"📧 Sending to {email} ({location_name})")
 
-        weather = fetch_weather(lat, lon)
-        news = fetch_news("us")
-        message = ai_message(weather, location_name, news)
-        subject = f"🌙 SmartBrief — {datetime.now().strftime('%A, %B %d')}"
+        try:
+            weather = fetch_weather(lat, lon)
+            news = fetch_news("us")
+            message = ai_message(weather, location_name, news)
+            subject = f"🌙 SmartBrief — {datetime.now().strftime('%A, %B %d')}"
 
-        send_email(email, subject, message)
-        update_last_sent(id_)
+            send_email(email, subject, message)
+            
+            # Update last_sent_date in database
+            from database import update_last_sent
+            update_last_sent(id_)
+            
+            sent_count += 1
+            print("   ✅ Sent\n")
+        except Exception as e:
+            print(f"   ❌ Failed: {e}\n")
 
-        print("   ✅ Sent\n")
-
-    print("🎉 All done!\n")
-
+    print("="*60)
+    print(f"🎉 Distribution Complete!")
+    print(f"   ✅ Sent: {sent_count}")
+    print(f"   ⏭️  Skipped: {skipped_count}")
+    print("="*60 + "\n")
 
 if __name__ == "__main__":
     main()

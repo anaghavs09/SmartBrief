@@ -1,9 +1,8 @@
-Flask==2.3.2
-Flask-Cors==3.0.10
+Flask==3.0.0
+Flask-CORS==4.0.0
+requests==2.31.0
 python-dotenv==1.0.0
-requests==2.32.0
-google-generativeai==0.1.0
-pytz==2025.2
-timezonefinder
+google-generativeai==0.8.3
 gunicorn==21.2.0
-google-genai
+timezonefinder==6.2.0
+pytz==2023.3
