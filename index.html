@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartBrief – Your Morning Brief</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,24 +11,35 @@
 
 <body>
 
-  <!-- HERO -->
-  <section class="hero container">
+  <!-- Hero Section -->
+  <section class="hero">
     <div class="hero-left">
       <h1>🌅 Start Your Day Smart</h1>
-      <p>
-        Receive a personalized morning brief with news, weather, and insights —
-        delivered daily at 7 AM your local time.
-      </p>
+      <p>Receive a personalized morning brief with news, weather, and insights, delivered to your inbox daily.</p>
 
-      <!-- SUBSCRIBE -->
       <form id="subscribeForm" class="subscribe-form">
-        <input type="email" id="emailInput" placeholder="Enter your email" required />
+        <input
+          type="email"
+          id="emailInput"
+          placeholder="Enter your email"
+          required
+        />
+
         <button type="submit" id="subscribeBtn" class="btn-primary">
           Subscribe
         </button>
+
+        <button
+          type="button"
+          id="unsubscribeBtn"
+          class="btn-secondary"
+          style="display:none"
+        >
+          Unsubscribe
+        </button>
       </form>
 
-      <p id="locationInfo" class="message"></p>
+      <p id="locationInfo"></p>
       <p id="message" class="message"></p>
     </div>
 
@@ -37,54 +48,32 @@
     </div>
   </section>
 
-  <!-- FEATURES -->
+  <!-- Features -->
   <section class="features container">
     <div class="feature-card">
       <h3>🌤️ Local Weather</h3>
-      <p>Your city’s daily forecast.</p>
+      <p>Your city’s forecast every morning.</p>
     </div>
     <div class="feature-card">
       <h3>📰 Top Headlines</h3>
-      <p>Curated news summaries.</p>
+      <p>Curated news in minutes.</p>
     </div>
     <div class="feature-card">
       <h3>💡 Smart Insights</h3>
-      <p>Actionable tips to start strong.</p>
+      <p>Start your day right.</p>
     </div>
     <div class="feature-card">
       <h3>☀️ Inspiration</h3>
-      <p>Motivation to energize your day.</p>
+      <p>Positive vibes daily.</p>
     </div>
   </section>
 
-  <!-- DAILY TIP -->
-  <section class="daily-tip container">
-    <div class="tip-card">
-      <h2>💌 Daily Tip</h2>
-      <p>
-        “Plan your top 3 tasks while enjoying your morning coffee for a focused day ahead.”
-      </p>
-    </div>
-  </section>
-
-  <!-- UNSUBSCRIBE -->
-  <section class="container unsubscribe">
-    <h3>Unsubscribe</h3>
-    <p>No hard feelings — you can stop emails anytime.</p>
-
-    <form id="unsubscribeForm" class="subscribe-form">
-      <input type="email" id="unsubscribeEmail" placeholder="Enter your email" required />
-      <button type="submit" class="btn-secondary">
-        Unsubscribe
-      </button>
-    </form>
-
-    <p id="unsubscribeMessage" class="message"></p>
-  </section>
-
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
-    <p>SmartBrief – Energize your mornings ✨</p>
+    <p>
+      SmartBrief – Energize your mornings ✨ |
+      <a href="?mode=unsubscribe" class="footer-link">Unsubscribe</a>
+    </p>
   </footer>
 
   <script src="script.js"></script>
