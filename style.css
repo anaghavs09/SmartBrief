@@ -108,3 +108,19 @@ footer {
 .footer-link:hover {
   text-decoration: underline;
 }
+.btn-secondary {
+  padding: 15px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: #EF4444;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(239,68,68,0.4);
+}
