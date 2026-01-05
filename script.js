@@ -1,38 +1,30 @@
 const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzVOQldUHHDhvtA0wk_6ZPF85I-e6OxfwObHPbjVhyNQzTIaulYT0BLwmcMEpErh-ueGQ/exec';
 
-// ===== 3D TILT EFFECT =====
-function initTiltEffect() {
-  const tiltElements = document.querySelectorAll('[data-tilt]');
-  
-  tiltElements.forEach(element => {
-    element.addEventListener('mousemove', handleTilt);
-    element.addEventListener('mouseleave', resetTilt);
+// ===== MOBILE MENU =====
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const navLinks = document.getElementById('navLinks');
+
+if (mobileMenuBtn) {
+  mobileMenuBtn.addEventListener('click', () => {
+    mobileMenuBtn.classList.toggle('active');
+    navLinks.classList.toggle('active');
   });
-  
-  function handleTilt(e) {
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const rotateX = (y - centerY) / 12;
-    const rotateY = (centerX - x) / 12;
-    
-    card.style.transform = `
-      perspective(1200px) 
-      rotateX(${rotateX}deg) 
-      rotateY(${rotateY}deg) 
-      scale3d(1.03, 1.03, 1.03)
-    `;
-  }
-  
-  function resetTilt(e) {
-    const card = e.currentTarget;
-    card.style.transform = 'perspective(1200px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-  }
+
+  // Close menu when clicking on a link
+  document.querySelectorAll('.nav-link, .nav-link-cta').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenuBtn.classList.remove('active');
+      navLinks.classList.remove('active');
+    });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!mobileMenuBtn.contains(e.target) && !navLinks.contains(e.target)) {
+      mobileMenuBtn.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
 }
 
 // ===== SMOOTH SCROLL =====
@@ -57,11 +49,11 @@ window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset;
   
   if (currentScroll > 100) {
-    navbar.style.boxShadow = '0 4px 24px rgba(168, 85, 247, 0.2)';
+    navbar.style.boxShadow = '0 4px 20px rgba(20, 184, 166, 0.2)';
     navbar.style.background = 'rgba(255, 255, 255, 0.95)';
   } else {
-    navbar.style.boxShadow = '0 2px 12px rgba(14, 165, 233, 0.15)';
-    navbar.style.background = 'rgba(255, 255, 255, 0.85)';
+    navbar.style.boxShadow = '0 2px 12px rgba(20, 184, 166, 0.15)';
+    navbar.style.background = 'rgba(255, 255, 255, 0.9)';
   }
   
   lastScroll = currentScroll;
@@ -90,7 +82,6 @@ if (subscribeForm) {
       return;
     }
     
-    // Show loading state
     const btn = document.getElementById('subscribeBtn');
     const btnText = btn.querySelector('.btn-text');
     const originalText = btnText.textContent;
@@ -102,7 +93,6 @@ if (subscribeForm) {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         
-        // Get location name
         const locationName = await getLocationName(lat, lon);
         
         if (locationInfo) {
@@ -127,7 +117,6 @@ if (subscribeForm) {
           showMessage('🎉 Success! You\'ll receive your SmartBrief daily.', 'success');
           emailInput.value = '';
           
-          // Confetti effect
           createConfetti();
           
         } catch (error) {
@@ -233,23 +222,23 @@ function showMessage(text, type) {
 
 // ===== CONFETTI EFFECT =====
 function createConfetti() {
-  const colors = ['#0EA5E9', '#A855F7', '#F97316', '#EC4899', '#10B981', '#FBBF24'];
-  const confettiCount = 60;
+  const colors = ['#14B8A6', '#FF6B6B', '#1E40AF', '#F59E0B', '#6EE7B7'];
+  const confettiCount = 50;
   
   for (let i = 0; i < confettiCount; i++) {
     const confetti = document.createElement('div');
     confetti.style.position = 'fixed';
-    confetti.style.width = '12px';
-    confetti.style.height = '12px';
+    confetti.style.width = '10px';
+    confetti.style.height = '10px';
     confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     confetti.style.left = Math.random() * 100 + '%';
     confetti.style.top = '-15px';
     confetti.style.opacity = '1';
     confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
-    confetti.style.transition = 'all 3.5s ease-out';
+    confetti.style.transition = 'all 3s ease-out';
     confetti.style.pointerEvents = 'none';
     confetti.style.zIndex = '9999';
-    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
     
     document.body.appendChild(confetti);
     
@@ -261,14 +250,14 @@ function createConfetti() {
     
     setTimeout(() => {
       confetti.remove();
-    }, 3500);
+    }, 3000);
   }
 }
 
-// ===== INTERSECTION OBSERVER FOR ANIMATIONS =====
+// ===== INTERSECTION OBSERVER FOR SCROLL ANIMATIONS =====
 const observerOptions = {
   threshold: 0.1,
-  rootMargin: '0px 0px -100px 0px'
+  rootMargin: '0px 0px -80px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -282,19 +271,16 @@ const observer = new IntersectionObserver((entries) => {
 
 // ===== PAGE INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize tilt effect
-  initTiltEffect();
-  
   // Animate elements on scroll
   const animateElements = document.querySelectorAll('.feature-card, .benefit-item');
   animateElements.forEach(el => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(40px)';
-    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(el);
   });
   
-  // Auto-fill email from URL parameter (for unsubscribe page)
+  // Auto-fill email from URL parameter
   const urlParams = new URLSearchParams(window.location.search);
   const emailParam = urlParams.get('email');
   
@@ -314,22 +300,9 @@ const feedbackButtons = document.querySelectorAll('.feedback-btn');
 feedbackButtons.forEach(btn => {
   btn.addEventListener('click', function() {
     this.style.opacity = '0.6';
-    this.style.transform = 'scale(0.95)';
     setTimeout(() => {
       this.style.opacity = '1';
-      this.style.transform = 'scale(1)';
       showMessage('Thank you for your feedback!', 'success');
-    }, 200);
-  });
-});
-
-// ===== PARALLAX EFFECT =====
-window.addEventListener('scroll', () => {
-  const scrolled = window.pageYOffset;
-  const parallaxElements = document.querySelectorAll('.floating-shape');
-  
-  parallaxElements.forEach((el, index) => {
-    const speed = (index + 1) * 0.3;
-    el.style.transform = `translateY(${scrolled * speed}px)`;
+    }, 150);
   });
 });

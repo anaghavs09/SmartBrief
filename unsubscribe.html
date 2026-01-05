@@ -8,35 +8,28 @@
   <link rel="stylesheet" href="style.css">
   <style>
     .unsubscribe-section {
-      min-height: 80vh;
+      min-height: 75vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 100px 2rem;
-      position: relative;
+      padding: 90px 2rem;
     }
     
     .unsubscribe-container {
-      max-width: 650px;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(30px) saturate(180%);
-      border: 3px solid transparent;
-      background-image: linear-gradient(white, white), linear-gradient(135deg, var(--primary-blue), var(--accent-pink));
-      background-origin: border-box;
-      background-clip: padding-box, border-box;
-      border-radius: 36px;
-      padding: 70px;
+      max-width: 600px;
+      background: white;
+      border-radius: 28px;
+      padding: 60px;
       box-shadow: var(--shadow-xl);
       text-align: center;
-      position: relative;
-      overflow: hidden;
-      animation: fadeInUp 0.6s ease;
+      border: 2px solid rgba(20, 184, 166, 0.15);
+      animation: fadeInUp 0.5s ease;
     }
     
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
@@ -44,161 +37,132 @@
       }
     }
     
-    .unsubscribe-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--accent-orange), var(--accent-pink), var(--primary-purple));
-      background-size: 300% 100%;
-      animation: shimmer 4s ease-in-out infinite;
-    }
-    
-    @keyframes shimmer {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    
     .unsubscribe-icon {
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 36px;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 6rem;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(236, 72, 153, 0.15));
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(255, 107, 107, 0.1));
       border-radius: 50%;
-      animation: gentleBounce 4s ease-in-out infinite;
-      filter: drop-shadow(0 8px 24px rgba(168, 85, 247, 0.3));
-    }
-    
-    @keyframes gentleBounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.05); }
     }
     
     .unsubscribe-title {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-weight: 900;
       color: var(--dark-navy);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       font-family: 'Poppins', sans-serif;
-      letter-spacing: -0.02em;
     }
     
     .unsubscribe-subtitle {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 48px;
-      font-weight: 500;
+      line-height: 1.7;
+      margin-bottom: 40px;
     }
     
     .unsubscribe-form {
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      margin-bottom: 48px;
+      gap: 16px;
+      margin-bottom: 40px;
     }
     
     .btn-unsubscribe {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 18px 40px;
-      background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+      gap: 10px;
+      padding: 16px 36px;
+      background: linear-gradient(135deg, #64748B, #475569);
       color: white;
       border: none;
-      border-radius: 16px;
-      font-size: 1.1rem;
-      font-weight: 800;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-sm);
       font-family: 'Poppins', sans-serif;
     }
     
     .btn-unsubscribe:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
     
     .feedback-section {
-      margin: 48px 0;
-      padding: 36px;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(168, 85, 247, 0.08));
-      border-radius: 24px;
-      border: 2px solid rgba(168, 85, 247, 0.2);
+      margin: 36px 0;
+      padding: 32px;
+      background: var(--bg-light);
+      border-radius: 20px;
+      border: 1px solid rgba(20, 184, 166, 0.1);
     }
     
     .feedback-title {
-      font-size: 1.1rem;
-      font-weight: 800;
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       font-family: 'Poppins', sans-serif;
     }
     
     .feedback-options {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      gap: 12px;
     }
     
     .feedback-btn {
-      padding: 16px;
+      padding: 14px;
       background: white;
-      border: 2px solid rgba(168, 85, 247, 0.3);
-      border-radius: 14px;
+      border: 2px solid rgba(20, 184, 166, 0.2);
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 600;
       color: var(--text-primary);
     }
     
     .feedback-btn:hover {
-      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+      background: var(--teal);
       color: white;
-      border-color: transparent;
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md), var(--glow-purple);
+      border-color: var(--teal);
+      transform: translateY(-2px);
     }
     
     .comeback-box {
-      margin-top: 36px;
-      padding-top: 36px;
-      border-top: 2px solid rgba(168, 85, 247, 0.2);
-      font-size: 1.05rem;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(20, 184, 166, 0.15);
+      font-size: 1rem;
       color: var(--text-secondary);
       font-weight: 600;
     }
     
     .comeback-link {
-      color: var(--primary-blue);
+      color: var(--teal);
       text-decoration: none;
       font-weight: 800;
       transition: all 0.3s ease;
-      border-bottom: 3px solid transparent;
       font-family: 'Poppins', sans-serif;
     }
     
     .comeback-link:hover {
-      color: var(--accent-orange);
-      border-bottom-color: var(--accent-orange);
+      color: var(--coral);
     }
     
     @media (max-width: 640px) {
       .unsubscribe-container {
-        padding: 50px 30px;
+        padding: 45px 30px;
       }
       
       .unsubscribe-title {
-        font-size: 2.2rem;
+        font-size: 2rem;
       }
       
       .feedback-options {
@@ -213,28 +177,26 @@
     <div class="floating-shape shape-1"></div>
     <div class="floating-shape shape-2"></div>
     <div class="floating-shape shape-3"></div>
-    <div class="floating-shape shape-4"></div>
   </div>
 
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
       <div class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="20" r="8" fill="url(#logoGradient)"/>
-            <path d="M20 4v4M20 32v4M36 20h-4M8 20H4M31.2 8.8l-2.8 2.8M11.6 28.4l-2.8 2.8M31.2 31.2l-2.8-2.8M11.6 11.6L8.8 8.8" stroke="url(#logoGradient)" stroke-width="2.5" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="logoGradient" x1="8" y1="8" x2="32" y2="32">
-                <stop offset="0%" stop-color="#F97316"/>
-                <stop offset="100%" stop-color="#EC4899"/>
-              </linearGradient>
-            </defs>
-          </svg>
+        <div class="logo-design">
+          <div class="logo-sb">
+            <span class="letter-s">S</span>
+            <span class="letter-b">B</span>
+          </div>
         </div>
         <span class="logo-text">SmartBrief</span>
       </div>
-      <div class="nav-links">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
         <a href="index.html" class="nav-link">← Back to Home</a>
       </div>
     </div>
@@ -243,26 +205,12 @@
   <!-- Unsubscribe Section -->
   <section class="unsubscribe-section">
     <div class="unsubscribe-container">
-      <div class="unsubscribe-icon">
-        <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
-          <circle cx="45" cy="45" r="35" stroke="url(#sadGradient)" stroke-width="4" opacity="0.4"/>
-          <circle cx="33" cy="40" r="4" fill="url(#sadGradient)"/>
-          <circle cx="57" cy="40" r="4" fill="url(#sadGradient)"/>
-          <path d="M33 58 Q45 52 57 58" stroke="url(#sadGradient)" stroke-width="4" stroke-linecap="round" fill="none"/>
-          <defs>
-            <linearGradient id="sadGradient" x1="10" y1="10" x2="80" y2="80">
-              <stop offset="0%" stop-color="#0EA5E9"/>
-              <stop offset="50%" stop-color="#A855F7"/>
-              <stop offset="100%" stop-color="#EC4899"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+      <div class="unsubscribe-icon">😢</div>
 
       <h1 class="unsubscribe-title">We're Sorry to See You Go</h1>
       <p class="unsubscribe-subtitle">
-        We hope SmartBrief made your mornings better. If you'd like to stop receiving 
-        your daily digest, enter your email below and we'll take care of it.
+        We hope SmartBrief served you well. Enter your email below 
+        to stop receiving your daily digest.
       </p>
 
       <form id="unsubscribeForm" class="unsubscribe-form">
@@ -312,21 +260,15 @@
       <div class="footer-top">
         <div class="footer-brand">
           <div class="logo">
-            <div class="logo-icon">
-              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="20" r="8" fill="url(#logoGradientFooter)"/>
-                <path d="M20 4v4M20 32v4M36 20h-4M8 20H4M31.2 8.8l-2.8 2.8M11.6 28.4l-2.8 2.8M31.2 31.2l-2.8-2.8M11.6 11.6L8.8 8.8" stroke="url(#logoGradientFooter)" stroke-width="2.5" stroke-linecap="round"/>
-                <defs>
-                  <linearGradient id="logoGradientFooter" x1="8" y1="8" x2="32" y2="32">
-                    <stop offset="0%" stop-color="#F97316"/>
-                    <stop offset="100%" stop-color="#EC4899"/>
-                  </linearGradient>
-                </defs>
-              </svg>
+            <div class="logo-design">
+              <div class="logo-sb">
+                <span class="letter-s">S</span>
+                <span class="letter-b">B</span>
+              </div>
             </div>
             <span class="logo-text">SmartBrief</span>
           </div>
-          <p class="footer-tagline">Your intelligent morning companion</p>
+          <p class="footer-tagline">Your intelligent daily companion</p>
         </div>
         
         <div class="footer-links">
@@ -347,7 +289,7 @@
       
       <div class="footer-bottom">
         <p class="footer-text">
-          © 2025 SmartBrief. Made with ❤️ for productive mornings
+          © 2025 SmartBrief. Made with ❤️ for staying informed
         </p>
       </div>
     </div>

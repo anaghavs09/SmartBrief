@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartBrief – Your Intelligent Morning Companion</title>
+  <title>SmartBrief – Your Intelligent Daily Companion</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -13,28 +13,26 @@
     <div class="floating-shape shape-1"></div>
     <div class="floating-shape shape-2"></div>
     <div class="floating-shape shape-3"></div>
-    <div class="floating-shape shape-4"></div>
   </div>
 
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
       <div class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="20" r="8" fill="url(#logoGradient)"/>
-            <path d="M20 4v4M20 32v4M36 20h-4M8 20H4M31.2 8.8l-2.8 2.8M11.6 28.4l-2.8 2.8M31.2 31.2l-2.8-2.8M11.6 11.6L8.8 8.8" stroke="url(#logoGradient)" stroke-width="2.5" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="logoGradient" x1="8" y1="8" x2="32" y2="32">
-                <stop offset="0%" stop-color="#DC143C"/>
-                <stop offset="100%" stop-color="#7B68EE"/>
-              </linearGradient>
-            </defs>
-          </svg>
+        <div class="logo-design">
+          <div class="logo-sb">
+            <span class="letter-s">S</span>
+            <span class="letter-b">B</span>
+          </div>
         </div>
         <span class="logo-text">SmartBrief</span>
       </div>
-      <div class="nav-links">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
         <a href="#features" class="nav-link">Features</a>
         <a href="#benefits" class="nav-link">Benefits</a>
         <a href="unsubscribe.html" class="nav-link-cta">Manage</a>
@@ -48,7 +46,7 @@
       <div class="hero-content">
         <div class="badge">
           <div class="badge-dot"></div>
-          <span>Intelligent Daily Digest</span>
+          <span>Smart Daily Digest</span>
         </div>
       
         <h1 class="hero-title">
@@ -57,9 +55,9 @@
         <p class="hero-tagline">Start Your Day Smart</p>
         
         <p class="hero-subtitle">
-          Your personalized morning intelligence delivered daily. Weather insights, 
+          Your personalized intelligence digest delivered daily. Weather insights, 
           curated headlines, and smart summaries—all in one beautiful email that 
-          adapts to your timezone, anywhere on the planet.
+          adapts to your timezone, wherever you are.
         </p>
 
         <!-- Subscribe Form -->
@@ -112,37 +110,42 @@
         </div>
       </div>
 
-      <!-- Hero Visual - NEW UNIQUE DESIGN -->
-      <div class="hero-visual-new">
-        <!-- Floating Cards -->
-        <div class="floating-card card-weather">
-          <div class="card-icon-large">🌤️</div>
-          <div class="card-title">Weather</div>
-          <div class="card-value">22°C</div>
-          <div class="card-subtitle">Sunny Day</div>
+      <!-- Hero Visual - Preview Cards -->
+      <div class="hero-visual-preview">
+        <div class="preview-container">
+          <div class="preview-card card-1">
+            <div class="card-shine"></div>
+            <div class="card-icon-big">🌤️</div>
+            <div class="card-title-big">Weather</div>
+            <div class="card-desc">Your local forecast</div>
+            <div class="card-badge badge-weather">Live Data</div>
+          </div>
+
+          <div class="preview-card card-2">
+            <div class="card-shine"></div>
+            <div class="card-icon-big">📰</div>
+            <div class="card-title-big">Headlines</div>
+            <div class="card-desc">Curated news</div>
+            <div class="card-badge badge-news">Daily</div>
+          </div>
+
+          <div class="preview-card card-3">
+            <div class="card-shine"></div>
+            <div class="card-icon-big">✨</div>
+            <div class="card-title-big">Insights</div>
+            <div class="card-desc">Smart summaries</div>
+            <div class="card-badge badge-insights">Ready</div>
+          </div>
         </div>
 
-        <div class="floating-card card-news">
-          <div class="card-icon-large">📰</div>
-          <div class="card-title">Headlines</div>
-          <div class="card-value">5</div>
-          <div class="card-subtitle">Top Stories</div>
-        </div>
-
-        <div class="floating-card card-delivery">
-          <div class="card-icon-large">📧</div>
-          <div class="card-title">Delivery</div>
-          <div class="card-value">✓</div>
-          <div class="card-subtitle">Automated</div>
-        </div>
-
-        <!-- Decorative Elements -->
-        <div class="deco-circle circle-1"></div>
-        <div class="deco-circle circle-2"></div>
-        <div class="deco-circle circle-3"></div>
+        <!-- Decorative rings -->
+        <div class="deco-ring ring-1"></div>
+        <div class="deco-ring ring-2"></div>
         
-        <!-- Central Glow -->
-        <div class="central-glow"></div>
+        <!-- Floating orbs -->
+        <div class="float-orb orb-1"></div>
+        <div class="float-orb orb-2"></div>
+        <div class="float-orb orb-3"></div>
       </div>
     </div>
   </section>
@@ -153,11 +156,11 @@
       <div class="section-header">
         <div class="section-badge">What You Get</div>
         <h2 class="section-title">Everything You Need in One Email</h2>
-        <p class="section-subtitle">Comprehensive morning intelligence at your fingertips</p>
+        <p class="section-subtitle">Comprehensive intelligence at your fingertips</p>
       </div>
 
       <div class="features-grid">
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1592210454359-9043f067919b?w=400&h=300&fit=crop&q=80" alt="Weather">
             <div class="feature-overlay"></div>
@@ -176,7 +179,7 @@
           </div>
         </div>
 
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop&q=80" alt="News">
             <div class="feature-overlay"></div>
@@ -195,7 +198,7 @@
           </div>
         </div>
 
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop&q=80" alt="Smart Summaries">
             <div class="feature-overlay"></div>
@@ -214,7 +217,7 @@
           </div>
         </div>
 
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=300&fit=crop&q=80" alt="Global">
             <div class="feature-overlay"></div>
@@ -224,7 +227,7 @@
             <h3 class="feature-title">Worldwide Coverage</h3>
             <p class="feature-description">
               Works anywhere on Earth with automatic timezone detection. Travel 
-              freely and still get your morning brief at the perfect time.
+              freely and still get your brief at the perfect time.
             </p>
             <div class="feature-tags">
               <span class="tag">Global</span>
@@ -233,16 +236,16 @@
           </div>
         </div>
 
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1501139083538-0139583c060f?w=400&h=300&fit=crop&q=80" alt="Perfect Timing">
             <div class="feature-overlay"></div>
           </div>
           <div class="feature-content">
             <div class="feature-icon">⏰</div>
-            <h3 class="feature-title">Automated Delivery</h3>
+            <h3 class="feature-title">Smart Delivery</h3>
             <p class="feature-description">
-              Arrives at the ideal time every morning in your local timezone. 
+              Arrives at your preferred time in your local timezone. 
               Consistent, reliable, and never intrusive.
             </p>
             <div class="feature-tags">
@@ -252,7 +255,7 @@
           </div>
         </div>
 
-        <div class="feature-card" data-tilt>
+        <div class="feature-card">
           <div class="feature-image">
             <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&h=300&fit=crop&q=80" alt="Privacy">
             <div class="feature-overlay"></div>
@@ -280,10 +283,10 @@
       <div class="benefits-grid">
         <div class="benefits-content">
           <div class="section-badge">Why Choose SmartBrief</div>
-          <h2 class="section-title">Transform Your Morning Routine</h2>
+          <h2 class="section-title">Transform Your Daily Routine</h2>
           <p class="benefits-text">
-            Imagine waking up to everything you need to start your day—weather, 
-            news, and insights—beautifully organized and personalized just for you.
+            Everything you need—weather, news, and insights—beautifully organized 
+            and personalized, delivered right to your inbox.
           </p>
           
           <div class="benefits-list">
@@ -291,7 +294,7 @@
               <div class="benefit-icon">✨</div>
               <div class="benefit-content">
                 <h4>Save Time</h4>
-                <p>Get all your morning information in one place instead of checking multiple apps</p>
+                <p>Get all your essential information in one place instead of checking multiple apps</p>
               </div>
             </div>
             
@@ -318,15 +321,16 @@
         </div>
         
         <div class="benefits-visual">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=800&fit=crop&q=80" alt="Team Success" class="benefits-image">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=800&fit=crop&q=80" alt="Reading News on Tablet" class="benefits-image">
           <div class="stats-card">
             <div class="stat">
-              <div class="stat-number">5 min</div>
-              <div class="stat-label">Daily Read Time</div>
+              <div class="stat-number">3 min</div>
+              <div class="stat-label">Quick Read</div>
             </div>
+            <div class="stat-divider"></div>
             <div class="stat">
-              <div class="stat-number">100%</div>
-              <div class="stat-label">Personalized</div>
+              <div class="stat-number">Daily</div>
+              <div class="stat-label">Updated</div>
             </div>
           </div>
         </div>
@@ -339,8 +343,8 @@
     <div class="cta-glow"></div>
     <div class="cta-container">
       <div class="cta-content">
-        <h2 class="cta-title">Ready for Smarter Mornings?</h2>
-        <p class="cta-subtitle">Join thousands who've transformed how they start their day</p>
+        <h2 class="cta-title">Ready to Stay Informed?</h2>
+        <p class="cta-subtitle">Get your personalized daily brief delivered to your inbox</p>
         <a href="#" class="btn-cta" onclick="document.getElementById('emailInput').scrollIntoView({behavior:'smooth'}); document.getElementById('emailInput').focus(); return false;">
           <span>Start Your Free Brief</span>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -352,27 +356,32 @@
     </div>
   </section>
 
+  <!-- Unsubscribe Section -->
+  <section class="unsubscribe-cta">
+    <div class="section-container">
+      <div class="unsub-box">
+        <h3>Need to Unsubscribe?</h3>
+        <p>We're sorry to see you go. You can manage your subscription anytime.</p>
+        <a href="unsubscribe.html" class="btn-unsub">Manage Subscription</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-top">
         <div class="footer-brand">
           <div class="logo">
-            <div class="logo-icon">
-              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="20" r="8" fill="url(#logoGradientFooter)"/>
-                <path d="M20 4v4M20 32v4M36 20h-4M8 20H4M31.2 8.8l-2.8 2.8M11.6 28.4l-2.8 2.8M31.2 31.2l-2.8-2.8M11.6 11.6L8.8 8.8" stroke="url(#logoGradientFooter)" stroke-width="2.5" stroke-linecap="round"/>
-                <defs>
-                  <linearGradient id="logoGradientFooter" x1="8" y1="8" x2="32" y2="32">
-                    <stop offset="0%" stop-color="#DC143C"/>
-                    <stop offset="100%" stop-color="#7B68EE"/>
-                  </linearGradient>
-                </defs>
-              </svg>
+            <div class="logo-design">
+              <div class="logo-sb">
+                <span class="letter-s">S</span>
+                <span class="letter-b">B</span>
+              </div>
             </div>
             <span class="logo-text">SmartBrief</span>
           </div>
-          <p class="footer-tagline">Your intelligent morning companion</p>
+          <p class="footer-tagline">Your intelligent daily companion</p>
         </div>
         
         <div class="footer-links">
@@ -394,7 +403,7 @@
       
       <div class="footer-bottom">
         <p class="footer-text">
-          © 2025 SmartBrief. Made with ❤️ for productive mornings
+          © 2025 SmartBrief. Made with ❤️ for staying informed
         </p>
       </div>
     </div>
