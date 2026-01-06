@@ -109,31 +109,116 @@ def fetch_weather(lat, lon, max_retries=3):
     return None
 
 # ----------------------------
-# FETCH WORLDWIDE NEWS
+# GET COUNTRY AND CITY FROM COORDINATES
 # ----------------------------
-def fetch_news(max_articles=10):
-    """Fetch worldwide news headlines"""
+def get_location_details(lat, lon):
+    """Get country code and city from coordinates"""
     try:
-        url = f"https://newsapi.org/v2/top-headlines?language=en&pageSize={max_articles}&apiKey={NEWS_API_KEY}"
-        response = requests.get(url, timeout=10)
+        url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json"
+        headers = {'User-Agent': 'SmartBrief/1.0'}
+        response = requests.get(url, headers=headers, timeout=10)
         data = response.json()
         
-        articles = data.get("articles", [])
-        news_list = []
+        address = data.get("address", {})
         
-        for a in articles:
-            if a.get("title") and a.get("description") and a.get("url"):
-                news_list.append({
-                    "title": a['title'],
-                    "description": a['description'],
-                    "url": a['url']
+        # Get country code (e.g., 'us', 'gb', 'in')
+        country_code = address.get("country_code", "us").lower()
+        
+        # Get city name
+        city = address.get("city") or address.get("town") or address.get("village") or "Unknown"
+        
+        return country_code, city
+        
+    except Exception as e:
+        print(f"         ⚠️ Location lookup failed: {e}")
+        return "us", "Unknown"
+
+# ----------------------------
+# FETCH MIXED NEWS (WORLDWIDE + COUNTRY + LOCAL)
+# ----------------------------
+def fetch_mixed_news(country_code, city_name):
+    """Fetch 2 worldwide, 2 country, 1 local news"""
+    all_news = []
+    
+    try:
+        # 1. Fetch 2 WORLDWIDE news
+        print(f"         → Worldwide news...")
+        worldwide_url = f"https://newsapi.org/v2/top-headlines?language=en&pageSize=3&apiKey={NEWS_API_KEY}"
+        worldwide_response = requests.get(worldwide_url, timeout=10)
+        worldwide_data = worldwide_response.json()
+        
+        for article in worldwide_data.get("articles", [])[:2]:
+            if article.get("title") and article.get("description") and article.get("url"):
+                all_news.append({
+                    "title": article['title'],
+                    "description": article['description'],
+                    "url": article['url'],
+                    "type": "🌍 Global"
                 })
         
-        return news_list[:5] if news_list else [{"title": "No news", "description": "", "url": ""}]
+        time.sleep(0.5)
+        
+        # 2. Fetch 2 COUNTRY-BASED news
+        print(f"         → Country news ({country_code.upper()})...")
+        country_url = f"https://newsapi.org/v2/top-headlines?country={country_code}&pageSize=3&apiKey={NEWS_API_KEY}"
+        country_response = requests.get(country_url, timeout=10)
+        country_data = country_response.json()
+        
+        for article in country_data.get("articles", [])[:2]:
+            if article.get("title") and article.get("description") and article.get("url"):
+                # Avoid duplicates
+                if not any(a['title'] == article['title'] for a in all_news):
+                    all_news.append({
+                        "title": article['title'],
+                        "description": article['description'],
+                        "url": article['url'],
+                        "type": f"🏳️ {country_code.upper()}"
+                    })
+        
+        time.sleep(0.5)
+        
+        # 3. Fetch 1 LOCAL/CITY news
+        if city_name and city_name != "Unknown":
+            print(f"         → Local news ({city_name})...")
+            local_url = f"https://newsapi.org/v2/everything?q={city_name}&language=en&sortBy=publishedAt&pageSize=2&apiKey={NEWS_API_KEY}"
+            local_response = requests.get(local_url, timeout=10)
+            local_data = local_response.json()
+            
+            for article in local_data.get("articles", [])[:1]:
+                if article.get("title") and article.get("description") and article.get("url"):
+                    # Avoid duplicates
+                    if not any(a['title'] == article['title'] for a in all_news):
+                        all_news.append({
+                            "title": article['title'],
+                            "description": article['description'],
+                            "url": article['url'],
+                            "type": f"📍 {city_name}"
+                        })
+        
+        # If we don't have 5 news items, fill with more worldwide
+        if len(all_news) < 5:
+            print(f"         → Filling remaining slots...")
+            extra_url = f"https://newsapi.org/v2/top-headlines?language=en&pageSize=10&apiKey={NEWS_API_KEY}"
+            extra_response = requests.get(extra_url, timeout=10)
+            extra_data = extra_response.json()
+            
+            for article in extra_data.get("articles", []):
+                if len(all_news) >= 5:
+                    break
+                if article.get("title") and article.get("description") and article.get("url"):
+                    if not any(a['title'] == article['title'] for a in all_news):
+                        all_news.append({
+                            "title": article['title'],
+                            "description": article['description'],
+                            "url": article['url'],
+                            "type": "🌍 Global"
+                        })
+        
+        return all_news[:5] if all_news else [{"title": "No news", "description": "", "url": "", "type": ""}]
         
     except Exception as e:
         print(f"         ⚠️ News failed: {e}")
-        return [{"title": "No news", "description": "", "url": ""}]
+        return [{"title": "No news available", "description": "", "url": "", "type": ""}]
 
 # ----------------------------
 # CLEAN HTML
@@ -156,7 +241,7 @@ def ai_message(weather, location, news_list):
     
     news_text = ""
     for i, a in enumerate(news_list[:5], 1):
-        news_text += f"{i}. {a['title']}\n{a['description'][:120]}\nURL: {a['url']}\n\n"
+        news_text += f"{i}. [{a.get('type', '')}] {a['title']}\n{a['description'][:120]}\nURL: {a['url']}\n\n"
     
     prompt = f"""Email for {location}, {today}. NO markdown, ONLY HTML:
 
@@ -171,21 +256,22 @@ def ai_message(weather, location, news_list):
 <span style="font-size:1rem;color:#0F172A;margin-right:20px"><strong>Feels:</strong> {weather['feels_like']}°C</span>
 <span style="font-size:1rem;color:#0F172A"><strong>UV:</strong> {weather['uv_index']}</span>
 </div>
-<p style="font-size:1rem;color:#1E293B;line-height:1.7;margin:0 0 12px 0">[1-2 helpful sentences]</p>
+<p style="font-size:1rem;color:#1E293B;line-height:1.7;margin:0 0 12px 0">[1-2 helpful sentences about weather]</p>
 <p style="font-size:0.9rem;color:#334155;margin:0">☀️ {weather['sunrise']} • 🌙 {weather['sunset']}</p>
 </div>
 
 <div style="background:#ffffff;padding:28px;border-radius:16px;border-left:5px solid #EF4444;box-shadow:0 4px 12px rgba(0,0,0,0.06)">
 <h3 style="color:#DC2626;font-size:1.2rem;margin:0 0 20px 0;font-weight:700">📰 Top 5 News • TLDR</h3>
 
-[5 items:]
+[Create 5 items. Include the news type badge (like "🌍 Global" or "📍 Dallas") from the data:]
 <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #E2E8F0">
+<div style="display:inline-block;background:#F0FDFA;color:#0D9488;padding:4px 10px;border-radius:12px;font-size:0.7rem;font-weight:700;margin-bottom:6px">[TYPE BADGE like "🌍 Global"]</div>
 <p style="font-weight:700;margin:0 0 8px 0;font-size:1rem;color:#0F172A;line-height:1.5">[Headline]</p>
 <p style="font-size:0.95rem;color:#334155;margin:0 0 10px 0;line-height:1.6">[TLDR]</p>
 <a href="[URL]" style="color:#0D9488;font-size:0.9rem;text-decoration:none;font-weight:600">Read more →</a>
 </div>
 
-NEWS:
+NEWS (all 5 with type badges and URLs):
 {news_text}
 
 Remove border from #5.
@@ -193,7 +279,7 @@ Remove border from #5.
 
 <p style="text-align:center;color:#334155;font-size:1rem;margin:24px 0 0 0;font-weight:600">Have a great day! 🚀</p>
 
-Natural. All 5 + URLs."""
+Natural tone. Include type badges. All 5 stories."""
     
     try:
         print("         🤖 Generating...")
@@ -210,6 +296,7 @@ Natural. All 5 + URLs."""
             border = '' if idx == 4 else 'border-bottom:1px solid #E2E8F0;'
             news_html += f"""
 <div style="margin-bottom:18px;padding-bottom:18px;{border}">
+<div style="display:inline-block;background:#F0FDFA;color:#0D9488;padding:4px 10px;border-radius:12px;font-size:0.7rem;font-weight:700;margin-bottom:6px">{article.get('type', '🌍 Global')}</div>
 <p style="font-weight:700;margin:0 0 8px 0;font-size:1rem;color:#0F172A;line-height:1.5">{article['title'][:120]}</p>
 <p style="font-size:0.95rem;color:#334155;margin:0 0 10px 0;line-height:1.6">{article['description'][:180] if article['description'] else 'Full story available.'}</p>
 <a href="{article['url']}" style="color:#0D9488;font-size:0.9rem;text-decoration:none;font-weight:600">Read more →</a>
@@ -241,7 +328,7 @@ Natural. All 5 + URLs."""
 """
 
 # ----------------------------
-# SEND EMAIL - DARK MODE FIX
+# SEND EMAIL
 # ----------------------------
 def send_email(to_email, subject, html_content):
     """Send email with high contrast for dark mode"""
@@ -254,7 +341,6 @@ def send_email(to_email, subject, html_content):
         from urllib.parse import quote
         unsubscribe_url = f"https://surya8055.github.io/SmartBrief/unsubscribe.html?email={quote(to_email)}"
         
-        # Using much darker colors that show up in dark mode
         full_html = f"""
 <!DOCTYPE html>
 <html>
@@ -366,9 +452,15 @@ def main():
             print("      ✓ Done")
             time.sleep(1)
             
-            print("   📰 News...")
-            news = fetch_news()
-            print(f"      ✓ {len(news)} articles")
+            # Get location details for news
+            print("   📍 Detecting location...")
+            country_code, city_name = get_location_details(lat, lon)
+            print(f"      ✓ {city_name}, {country_code.upper()}")
+            time.sleep(1)
+            
+            print("   📰 Fetching mixed news...")
+            news = fetch_mixed_news(country_code, city_name)
+            print(f"      ✓ {len(news)} articles (worldwide + country + local)")
             time.sleep(1)
             
             print("   ✨ Generating...")
