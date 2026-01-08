@@ -9,16 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --accent: #38bdf8;
+            --teal: #14B8A6;
+            --coral: #FF6B6B;
+            --navy: #1E40AF;
+            --amber: #F59E0B;
+            --mint: #6EE7B7;
+            --bg: #F8FAFC;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            background: linear-gradient(135deg, #F0FDFA 0%, #FEF3C7 100%);
+            color: #0F172A;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,28 +31,27 @@
         }
 
         .container {
-            background: var(--card);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
             padding: 40px;
             border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 40px rgba(20, 184, 166, 0.1);
             max-width: 600px;
             width: 100%;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(20, 184, 166, 0.2);
         }
 
         h1 {
             margin-bottom: 10px;
             font-weight: 800;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--navy);
         }
 
         p {
-            color: #94a3b8;
+            color: #475569;
             margin-bottom: 30px;
+            font-weight: 500;
         }
 
         .chart-container {
@@ -68,24 +69,26 @@
         }
 
         .stat-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: white;
             padding: 15px;
             border-radius: 12px;
             font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(20, 184, 166, 0.1);
         }
 
         .back-btn {
             margin-top: 40px;
-            color: var(--accent);
+            color: var(--teal);
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
-            opacity: 0.8;
-            transition: opacity 0.2s;
+            transition: transform 0.2s;
+            display: inline-block;
         }
 
         .back-btn:hover {
-            opacity: 1;
+            transform: translateX(-5px);
         }
     </style>
 </head>
@@ -93,20 +96,20 @@
 <body>
     <div class="container">
         <h1>SmartBrief Stack</h1>
-        <p>100% Interactive Tech Distribution</p>
+        <p>Interactive Technology Distribution</p>
 
         <div class="chart-container">
             <canvas id="techChart"></canvas>
         </div>
 
         <div class="stats">
-            <div class="stat-item">🚀 <b>Python</b>: Core Logic</div>
-            <div class="stat-item">🎨 <b>Vanilla CSS</b>: Premium UI</div>
-            <div class="stat-item">📊 <b>Google Sheets</b>: User DB</div>
-            <div class="stat-item">🔒 <b>SMTP SSL</b>: Encrypted Mail</div>
+            <div class="stat-item">🚀 <b>Python</b>: The Brain</div>
+            <div class="stat-item">🎨 <b>HTML/CSS</b>: Premium UI</div>
+            <div class="stat-item">📊 <b>Sheets</b>: Global Database</div>
+            <div class="stat-item">🔒 <b>SSL</b>: Encrypted Delivery</div>
         </div>
 
-        <a href="README.md" class="back-btn">← Back to Documentation</a>
+        <a href="README.md" class="back-btn">← Back to README</a>
     </div>
 
     <script>
@@ -118,14 +121,15 @@
                 datasets: [{
                     data: [45, 25, 15, 10, 5],
                     backgroundColor: [
-                        '#1E40AF', // Navy (Python)
-                        '#14B8A6', // Teal (HTML/CSS)
-                        '#FF6B6B', // Coral (JS)
-                        '#F59E0B', // Amber (Sheets)
-                        '#6EE7B7'  // Mint (JSON)
+                        '#1E40AF', // Navy
+                        '#14B8A6', // Teal
+                        '#FF6B6B', // Coral
+                        '#F59E0B', // Amber
+                        '#6EE7B7'  // Mint
                     ],
-                    borderWidth: 0,
-                    hoverOffset: 20
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 25
                 }]
             },
             options: {
@@ -133,20 +137,14 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#94a3b8',
-                            font: {
-                                family: "'Inter', sans-serif",
-                                size: 12,
-                                weight: '600'
-                            },
+                            color: '#475569',
+                            font: { family: "'Inter', sans-serif", size: 12, weight: '600' },
                             padding: 20
                         }
                     },
                     tooltip: {
                         enabled: true,
-                        backgroundColor: '#0f172a',
-                        titleFont: { size: 16 },
-                        bodyFont: { size: 14 },
+                        backgroundColor: '#1E293B',
                         padding: 15,
                         displayColors: false,
                         callbacks: {
@@ -156,7 +154,7 @@
                         }
                     }
                 },
-                cutout: '70%',
+                cutout: '72%',
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: {
