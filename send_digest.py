@@ -10,7 +10,24 @@ from email.mime.text import MIMEText
 import time
 import sys
 import re
+import json
 from read_sheets import get_subscribers_from_sheets
+
+CACHE_FILE = "digest_cache.json"
+
+def load_cache():
+    try:
+        with open(CACHE_FILE, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def save_cache(cache):
+    try:
+        with open(CACHE_FILE, 'w') as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ Failed to save cache: {e}")
 
 # Suppress warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -433,10 +450,44 @@ def main():
     if TEST_MODE:
         print(f"🧪 TEST MODE")
     
-    print(f"⏰ {datetime.now(pytz.utc).strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    now_utc = datetime.now(pytz.utc)
+    print(f"⏰ {now_utc.strftime('%Y-%m-%d %H:%M:%S %Z')}")
     print("="*70 + "\n")
     
-    print("📊 Reading subscribers...")
+    # ------------------
+    # CACHE SETUP
+    # ------------------
+    today_str = now_utc.strftime("%Y-%m-%d")
+    cache = load_cache()
+    
+    # Initialize today's cache structure if missing
+    if today_str not in cache:
+        cache[today_str] = {
+            "quote": None,
+            "locations": {}
+        }
+    
+    # ------------------
+    # 1. QUOTE (Global)
+    # ------------------
+    print("� Checking quote...")
+    quote = cache[today_str].get("quote")
+    
+    if not quote:
+        print("   Fetching new quote...")
+        quote = fetch_quote()
+        cache[today_str]["quote"] = quote
+        save_cache(cache)
+        print(f"   ✓ Saved: {quote['a']}")
+    else:
+        print(f"   ✓ Loaded from cache: {quote['a']}")
+    
+    print("-" * 30)
+
+    # ------------------
+    # 2. SUBSCRIBERS
+    # ------------------
+    print("�📊 Reading subscribers...")
     subscribers = get_subscribers_from_sheets()
     
     if not subscribers:
@@ -465,31 +516,37 @@ def main():
             print(f"   🧪 TEST MODE")
         
         try:
-            print("   🌤️  Weather...")
-            weather = fetch_weather(lat, lon, max_retries=3)
+            # Check Cache for Location
+            cached_html = cache[today_str]["locations"].get(location)
             
-            if not weather:
-                failed_count += 1
+            if cached_html:
+                print("   📦 Using cached digest...")
+                message = cached_html
+            else:
+                # GENERATE NEW
+                print("   🌤️  Weather...")
+                weather = fetch_weather(lat, lon, max_retries=3)
+                
+                if not weather:
+                    failed_count += 1
+                    time.sleep(2)
+                    continue
+                print("      ✓ Done")
+                
+                print("   📰 News...")
+                news = fetch_news(location)
+                print(f"      ✓ {len(news)} articles")
+                
+                print("   ✨ Generating...")
+                message = ai_message(weather, location, news, quote)
+                print("      ✓ Done")
+                
+                # Save to cache
+                cache[today_str]["locations"][location] = message
+                save_cache(cache)
+                print("      ✓ Saved to cache")
+                
                 time.sleep(2)
-                continue
-            
-            print("      ✓ Done")
-            time.sleep(1)
-            
-            print("   📰 News...")
-            news = fetch_news(location)
-            print(f"      ✓ {len(news)} articles")
-            time.sleep(1)
-
-            print("   💬 Quote...")
-            quote = fetch_quote()
-            print(f"      ✓ {quote['a']}")
-            time.sleep(1)
-            
-            print("   ✨ Generating...")
-            message = ai_message(weather, location, news, quote)
-            print("      ✓ Done")
-            time.sleep(2)
             
             print("   📤 Sending...")
             today_subject = datetime.now().strftime("%A, %B %d, %Y")
