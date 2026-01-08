@@ -52,7 +52,7 @@ def is_7am_local_time(lat, lon, last_sent_date):
         if last_sent_date == today_str:
             return False
         
-        return local_time.hour == 18
+        return local_time.hour == 7
         
     except Exception as e:
         print(f"      ⚠️ Time check error: {e}")
@@ -361,8 +361,15 @@ def send_email(to_email, subject, html_content):
         msg.attach(MIMEText(full_html, "html"))
         
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15) as server:
+            server.set_debuglevel(1)  # Enable debug output
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+            failed = server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+            
+            if failed:
+                print(f"         ⚠️ SMTP Failed recipients: {failed}")
+                return False
+            else:
+                print(f"         ✅ SMTP Accepted message")
         
         return True
         
@@ -376,6 +383,7 @@ def send_email(to_email, subject, html_content):
 def main():
     print("\n" + "="*70)
     print(f"🚀 SmartBrief Distribution")
+    print(f"   From: {SENDER_EMAIL}")
     
     if TEST_MODE:
         print(f"🧪 TEST MODE")
@@ -400,7 +408,7 @@ def main():
         row_id, email, lat, lon, location, subscribed_at, last_sent = sub
         
         print(f"\n{'='*60}")
-        print(f"📧 [{idx}/{len(subscribers)}] {location}")
+        print(f"📧 [{idx}/{len(subscribers)}] {location} ({email})")
         print(f"{'='*60}")
         
         if not TEST_MODE and not is_7am_local_time(lat, lon, last_sent):
