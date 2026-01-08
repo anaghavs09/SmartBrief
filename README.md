@@ -166,7 +166,7 @@ This single block of logic saves roughly **90% of API costs** in high-density ar
 
 1.  **Clone the Repository**:
     ```bash
-    git clone https://github.com/YourUsername/SmartBrief.git
+    git clone https://github.com/Surya8055/SmartBrief.git
     cd SmartBrief
     ```
 2.  **Requirements**:
