@@ -237,6 +237,8 @@ def ai_message(weather, location, news_list, quote):
 <a href="[URL]" style="color:#0D9488;font-size:0.9rem;text-decoration:none;font-weight:600">Read more →</a>
 </div>
 
+IMPORTANT: You must replace [URL] with the actual URL provided in the input for that specific article. Do not leave it as [URL]. Do not hallucinate links.
+
 NEWS:
 {news_text}
 
@@ -251,6 +253,14 @@ Natural. All 5 + URLs."""
         print("         🤖 Generating...")
         response = model.generate_content(prompt)
         content = clean_html_response(response.text)
+        print("         ℹ️ DEBUG HTML SNIPPET:")
+        print(content[:500]) # First 500 chars to check header
+        # Check for first link
+        match = re.search(r'href="(http[^"]+)"', content)
+        if match:
+             print(f"         ℹ️ Found link: {match.group(1)}")
+        else:
+             print(f"         ⚠️ No http link found in content snippet or bad format")
         print("         ✓ Ready")
         return content
         
