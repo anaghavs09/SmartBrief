@@ -51,6 +51,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 tf = TimezoneFinder()
+gemini_calls = 0
 
 # ----------------------------
 # TIME CHECK
@@ -319,6 +320,8 @@ Natural. All 5 + URLs."""
     
     try:
         print("         🤖 Generating...")
+        global gemini_calls
+        gemini_calls += 1
         response = model.generate_content(prompt)
         content = clean_html_response(response.text)
         print("         ✓ Ready")
@@ -572,6 +575,7 @@ def main():
     print(f"   ✅ Sent: {sent_count}")
     print(f"   ⏭️  Skipped: {skipped_count}")
     print(f"   ❌ Failed: {failed_count}")
+    print(f"   ✨ Gemini API Calls: {gemini_calls}")
     print("="*70 + "\n")
 
 if __name__ == "__main__":
