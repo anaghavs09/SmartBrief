@@ -17,7 +17,7 @@ SmartBrief is a sophisticated automation pipeline that transforms atmospheric da
 ---
 
 > [!NOTE]
-> **� Fun Fact**: SmartBrief generates localized briefings once per city per day. If you have 100 users in the same city, only **1 Gemini API call** is made. This saves over 99% in operational costs!
+> **✨ Fun Fact**: SmartBrief generates localized briefings once per city per day. If you have 100 users in the same city, only **1 Gemini API call** is made. This saves over 99% in operational costs!
 
 ---
 
